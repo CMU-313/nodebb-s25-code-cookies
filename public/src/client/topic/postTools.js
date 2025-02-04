@@ -116,15 +116,6 @@ define('forum/topic/postTools', [
 			onReplyClicked($(this), tid);
 		});
 
-		$('.topic').on('click', '[component="topic/reply-as-topic"]', function () {
-			translator.translate(`[[topic:link-back, ${ajaxify.data.titleRaw}, ${config.relative_path}/topic/${ajaxify.data.slug}]]`, function (body) {
-				hooks.fire('action:composer.topic.new', {
-					cid: ajaxify.data.cid,
-					body: body,
-				});
-			});
-		});
-
 		postContainer.on('click', '[component="post/bookmark"]', function () {
 			return bookmarkPost($(this), getData($(this), 'data-pid'));
 		});
