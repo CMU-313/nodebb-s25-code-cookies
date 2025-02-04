@@ -15,6 +15,9 @@ const privileges = require('../privileges');
 const categories = require('../categories');
 const translator = require('../translator');
 
+// List of banned words
+const BANNED_WORDS = ["ryan"]
+
 module.exports = function (Topics) {
 	Topics.create = async function (data) {
 		// This is an internal method, consider using Topics.post instead
@@ -193,6 +196,11 @@ module.exports = function (Topics) {
 			data.timestamp = topicData.lastposttime + 1;
 		}
 
+		// Add a flag to any content with banned words 
+		if (flagContent(data.content)) {
+			data.contentFlag = true;
+		}
+
 		data.ip = data.req ? data.req.ip : null;
 		let postData = await posts.create(data);
 		postData = await onNewPost(postData, data);
@@ -317,5 +325,11 @@ module.exports = function (Topics) {
 		if (!canReply) {
 			throw new Error('[[error:no-privileges]]');
 		}
+	}
+
+	// Splits a content string and checks if any of the words in it are in the banned words list
+	function flagContent(content) {
+		let words = content.toLowerCase().split(" ");
+		return words.some(x => BANNED_WORDS.includes(x));
 	}
 };
