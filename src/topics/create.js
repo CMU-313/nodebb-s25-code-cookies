@@ -14,9 +14,7 @@ const posts = require('../posts');
 const privileges = require('../privileges');
 const categories = require('../categories');
 const translator = require('../translator');
-
-// List of banned words
-const BANNED_WORDS = ["ryan"]
+const flagContent = require('../posts/flagContent');
 
 module.exports = function (Topics) {
 	Topics.create = async function (data) {
@@ -325,11 +323,5 @@ module.exports = function (Topics) {
 		if (!canReply) {
 			throw new Error('[[error:no-privileges]]');
 		}
-	}
-
-	// Splits a content string and checks if any of the words in it are in the banned words list
-	function flagContent(content) {
-		let words = content.toLowerCase().split(" ");
-		return words.some(x => BANNED_WORDS.includes(x));
 	}
 };
