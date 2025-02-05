@@ -29,7 +29,6 @@ module.exports = function (Posts) {
 		if (!postData) {
 			throw new Error('[[error:no-post]]');
 		}
-		console.log("Old Data:\n", postData);
 
 		const topicData = await topics.getTopicFields(postData.tid, [
 			'cid', 'mainPid', 'title', 'timestamp', 'scheduled', 'slug', 'tags',
