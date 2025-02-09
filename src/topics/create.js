@@ -194,7 +194,7 @@ module.exports = function (Topics) {
 			data.timestamp = topicData.lastposttime + 1;
 		}
 
-		// Add a flag to any content with banned words 
+		// Add a flag to any content with banned words
 		if (flagContent(data.content)) {
 			data.contentFlag = true;
 		}
