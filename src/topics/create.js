@@ -193,6 +193,8 @@ module.exports = function (Topics) {
 			data.timestamp = topicData.lastposttime + 1;
 		}
 
+		data.contentAnonymous = true;
+
 		data.ip = data.req ? data.req.ip : null;
 		let postData = await posts.create(data);
 		postData = await onNewPost(postData, data);
