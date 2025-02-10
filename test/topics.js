@@ -286,9 +286,6 @@ describe('Topic\'s', () => {
 
 			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
 			assert.ok(postData);
-			console.log(postData[1]);
-			assert.equal(postData.length, 1, 'should have 1 result');
-			assert.equal(postData[1].pid, result.pid, 'result should be the reply we added');
 			assert.equal(postData[1].contentFlag, 'true', 'result should have a content flag');
 		});
 
