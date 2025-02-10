@@ -34,7 +34,7 @@ module.exports = function (Posts) {
 			uid: uid,
 			tid: tid,
 			content: content,
-			timestamp: timestamp,
+			timestamp: timestamp
 		};
 
 		if (data.toPid) {
@@ -47,6 +47,10 @@ module.exports = function (Posts) {
 			postData.handle = data.handle;
 		}
 
+		postData.contentAnonymous = true;
+		console.log("Anonymous attribute added");
+
+		
 		let result = await plugins.hooks.fire('filter:post.create', { post: postData, data: data });
 		postData = result.post;
 		await db.setObject(`post:${postData.pid}`, postData);
