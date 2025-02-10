@@ -194,6 +194,7 @@ module.exports = function (Topics) {
 		}
 
 		data.contentAnonymous = true;
+		console.log("Anonymous attribute added")
 
 		data.ip = data.req ? data.req.ip : null;
 		let postData = await posts.create(data);
