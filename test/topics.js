@@ -277,6 +277,19 @@ describe('Topic\'s', () => {
 
 			assert.equal(postData.length, 1, 'should have 1 result');
 			assert.equal(postData[0].pid, result.pid, 'result should be the reply we added');
+			assert.equal(postData[0].contentFlag, undefined, 'result should not have a content flag');
+		});
+
+		it('should add content flag', async () => {
+			const result = await topics.reply({ uid: topic.userId, content: 'test reply, fuck', tid: newTopic.tid, toPid: newPost.pid });
+			assert.ok(result);
+
+			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
+			assert.ok(postData);
+
+			assert.equal(postData.length, 1, 'should have 1 result');
+			assert.equal(postData[0].pid, result.pid, 'result should be the reply we added');
+			assert.equal(postData[0].contentFlag, true, 'result should have a content flag');
 		});
 
 		it('should error if pid is not a number', async () => {
