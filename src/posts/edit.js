@@ -13,6 +13,7 @@ const pubsub = require('../pubsub');
 const utils = require('../utils');
 const slugify = require('../slugify');
 const translator = require('../translator');
+const flagContent = require('./flagContent');
 
 module.exports = function (Posts) {
 	pubsub.on('post:edit', (pid) => {
@@ -195,6 +196,7 @@ module.exports = function (Posts) {
 		const editPostData = {
 			content: data.content,
 			editor: data.uid,
+			contentFlag: flagContent(data.content),
 		};
 
 		// For posts in scheduled topics, if edited before, use edit timestamp

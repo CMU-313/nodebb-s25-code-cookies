@@ -14,6 +14,7 @@ const posts = require('../posts');
 const privileges = require('../privileges');
 const categories = require('../categories');
 const translator = require('../translator');
+const flagContent = require('../posts/flagContent');
 
 module.exports = function (Topics) {
 	Topics.create = async function (data) {
@@ -191,6 +192,11 @@ module.exports = function (Topics) {
 		// For replies to scheduled topics, don't have a timestamp older than topic's itself
 		if (topicData.scheduled) {
 			data.timestamp = topicData.lastposttime + 1;
+		}
+
+		// Add a flag to any content with banned words
+		if (flagContent(data.content)) {
+			data.contentFlag = true;
 		}
 
 		data.ip = data.req ? data.req.ip : null;
