@@ -64,6 +64,11 @@
 
 {{{ if posts.display_topic_owner_tools }}}
 {{{ if !posts.selfPost}}}
+<li>
+	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/edit" role="menuitem" href="#">
+		<span class="menu-icon"><i class="fa fa-fw text-secondary fa-pencil"></i></span> [[topic:flag]]
+	</a>
+</li>
 <li {{{ if posts.deleted }}}hidden{{{ end }}}>
 	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/delete" role="menuitem" href="#" class="{{{ if posts.deleted }}}hidden{{{ end }}}">
 		<span class="menu-icon"><i class="fa fa-fw text-secondary fa-trash-o"></i></span> [[topic:delete]]
