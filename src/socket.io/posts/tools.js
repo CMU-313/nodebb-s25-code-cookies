@@ -2,6 +2,7 @@
 
 const nconf = require('nconf');
 
+const topics = require('../../topics');
 const db = require('../../database');
 const posts = require('../../posts');
 const flags = require('../../flags');
@@ -36,6 +37,7 @@ module.exports = function (SocketPosts) {
 		});
 
 		const postData = results.posts;
+		const topicsData = await topics.getTopicDataByPid(data.pid);
 		postData.absolute_url = `${nconf.get('url')}/post/${data.pid}`;
 		postData.bookmarked = results.bookmarked;
 		postData.selfPost = socket.uid && socket.uid === postData.uid;
@@ -43,6 +45,7 @@ module.exports = function (SocketPosts) {
 		postData.display_delete_tools = results.canDelete.flag;
 		postData.display_purge_tools = results.canPurge;
 		postData.display_flag_tools = socket.uid && results.canFlag.flag;
+		postData.display_topic_owner_tools = socket.uid === topicsData.uid;
 		postData.display_moderator_tools = postData.display_edit_tools || postData.display_delete_tools;
 		postData.display_move_tools = results.isAdmin || results.isModerator;
 		postData.display_change_owner_tools = results.isAdmin || results.isModerator;
