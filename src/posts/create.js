@@ -34,7 +34,7 @@ module.exports = function (Posts) {
 			uid: uid,
 			tid: tid,
 			content: content,
-			timestamp: timestamp
+			timestamp: timestamp,
 		};
 
 		if (data.toPid) {
