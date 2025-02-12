@@ -65,16 +65,16 @@
 {{{ if posts.display_topic_owner_tools }}}
 {{{ if !posts.selfPost}}}
 <li {{{ if posts.deleted }}}hidden{{{ end }}}>
-	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/edit" role="menuitem" href="#" class="{{{ if posts.deleted }}}hidden{{{ end }}}">
-		<span class="menu-icon"><i class="fa fa-star" style="color: goldenrod;"></i></span> [[topic:endorse]]
-	</a>
-</li>
-<li {{{ if posts.deleted }}}hidden{{{ end }}}>
 	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/delete" role="menuitem" href="#" class="{{{ if posts.deleted }}}hidden{{{ end }}}">
 		<span class="menu-icon"><i class="fa fa-fw text-secondary fa-trash-o"></i></span> [[topic:delete]]
 	</a>
 </li>
 {{{end}}}
+<li {{{ if posts.deleted }}}hidden{{{ end }}}>
+	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/edit" role="menuitem" href="#" class="{{{ if posts.deleted }}}hidden{{{ end }}}">
+		<span class="menu-icon"><i class="fa fa-star" style="color: goldenrod;"></i></span> [[topic:endorse]]
+	</a>
+</li>
 {{{end}}}
 
 {{{ if !posts.deleted }}}
