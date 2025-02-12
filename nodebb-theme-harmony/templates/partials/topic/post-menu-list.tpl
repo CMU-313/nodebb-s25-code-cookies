@@ -71,7 +71,7 @@
 </li>
 {{{end}}}
 <li {{{ if posts.deleted }}}hidden{{{ end }}}>
-	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/edit" role="menuitem" href="#" class="{{{ if posts.deleted }}}hidden{{{ end }}}">
+	<a class="dropdown-item rounded-1 d-flex align-items-center gap-2" component="post/endorse" role="menuitem" href="#" class="{{{ if posts.deleted }}}hidden{{{ end }}}">
 		<span class="menu-icon"><i class="fa fa-star" style="color: goldenrod;"></i></span> Endorse
 	</a>
 </li>

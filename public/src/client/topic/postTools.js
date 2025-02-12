@@ -257,6 +257,33 @@ define('forum/topic/postTools', [
 		postContainer.on('click', '[component="post/chat"]', function () {
 			openChat($(this));
 		});
+
+		postContainer.on('click', '[component="post/endorse"]', function () {
+			const postData = {
+				tid: ajaxify.data.tid,
+				pid: 21,
+				handle: undefined,
+				content: "Newist Content",
+				endorsed: true,
+			};
+			api.put(`/posts/29`, postData, function (err, data) {
+				ready = true;
+				if (err) {
+					return alerts.error(err);
+				}
+				if (data && data.queued) {
+					alerts.alert({
+						type: 'success',
+						title: '[[global:alert.success]]',
+						message: data.message,
+						timeout: 10000,
+						clickfn: function () {
+							ajaxify.go(`/post-queue/${data.id}`);
+						},
+					});
+				}
+			});
+		});
 	}
 
 	async function onReplyClicked(button, tid) {
