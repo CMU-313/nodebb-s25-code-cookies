@@ -259,14 +259,18 @@ define('forum/topic/postTools', [
 		});
 
 		postContainer.on('click', '[component="post/endorse"]', function () {
+			const btn = $(this);
+			const pid = getData(btn, 'data-pid');
+			const content = components.get('post', 'pid', pid).find('[component="post/content"]').text();
+			const contentLength = content.length;
 			const postData = {
 				tid: ajaxify.data.tid,
-				pid: 21,
+				pid: Number(pid),
 				handle: undefined,
-				content: "Newist Content",
+				content: content.substring(1, contentLength - 2),
 				endorsed: true,
 			};
-			api.put(`/posts/29`, postData, function (err, data) {
+			api.put(`/posts/${pid}`, postData, function (err, data) {
 				ready = true;
 				if (err) {
 					return alerts.error(err);
