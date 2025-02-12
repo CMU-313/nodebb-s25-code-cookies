@@ -46,6 +46,9 @@ module.exports = function (Posts) {
 		if (data.handle && !parseInt(uid, 10)) {
 			postData.handle = data.handle;
 		}
+		if (data.contentFlag) {
+			postData.contentFlag = data.contentFlag;
+		}
 
 		let result = await plugins.hooks.fire('filter:post.create', { post: postData, data: data });
 		postData = result.post;
