@@ -258,17 +258,16 @@ define('forum/topic/postTools', [
 			openChat($(this));
 		});
 
-		postContainer.on('click', '[component="post/endorse"]', function () {
+		postContainer.on('click', '[component="post/endorse"]', async function () {
 			const btn = $(this);
 			const pid = getData(btn, 'data-pid');
-			const content = components.get('post', 'pid', pid).find('[component="post/content"]').text();
-			const contentLength = content.length;
+			const uid = getData(btn, 'data-uid');
+			const { content } = await api.get(`/posts/${pid}/raw`);
 			const postData = {
-				tid: ajaxify.data.tid,
 				pid: Number(pid),
-				handle: undefined,
-				content: content.substring(1, contentLength - 2),
-				endorsed: true,
+				uid: Number(uid),
+				content: content,
+				endorsed: 'true',
 			};
 			api.put(`/posts/${pid}`, postData, function (err, data) {
 				ready = true;
