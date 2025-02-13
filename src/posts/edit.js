@@ -197,6 +197,7 @@ module.exports = function (Posts) {
 			content: data.content,
 			editor: data.uid,
 			contentFlag: flagContent(data.content),
+			endorsed: data.endorsed == undefined ? postData.endorsed : data.endorsed,
 		};
 
 		// For posts in scheduled topics, if edited before, use edit timestamp
