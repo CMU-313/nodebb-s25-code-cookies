@@ -168,6 +168,7 @@ privsPosts.canDelete = async function (pid, uid) {
 		isMod: posts.isModerator([pid], uid),
 		isLocked: topics.isLocked(postData.tid),
 		isOwner: posts.isOwner(pid, uid),
+		isTopicOwner: topics.isOwner(postData.tid, uid),
 		'posts:delete': privsPosts.can('posts:delete', pid, uid),
 	});
 	results.isMod = results.isMod[0];
@@ -184,7 +185,7 @@ privsPosts.canDelete = async function (pid, uid) {
 		return { flag: false, message: `[[error:post-delete-duration-expired, ${meta.config.postDeleteDuration}]]` };
 	}
 	const { deleterUid } = postData;
-	const flag = results['posts:delete'] && ((results.isOwner && (deleterUid === 0 || deleterUid === postData.uid)) || results.isMod);
+	const flag = results['posts:delete'] && ((results.isOwner && (deleterUid === 0 || deleterUid === postData.uid)) || results.isMod || results.isTopicOwner);
 	return { flag: flag, message: '[[error:no-privileges]]' };
 };
 
