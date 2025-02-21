@@ -194,11 +194,17 @@ module.exports = function (Posts) {
 	}
 
 	function getEditPostData(data, topicData, postData) {
+		// Toggle endorsed attribute if data.endorsed is true
+		let endorsed = postData.endorsed;
+		if (data.endorsed == 'true'){
+			endorsed = postData.endorsed == 'true' ? 'false' : 'true';
+		}
+		
 		const editPostData = {
 			content: data.content,
 			editor: data.uid,
 			contentFlag: flagContent(data.content),
-			endorsed: data.endorsed == undefined ? postData.endorsed : data.endorsed,
+			endorsed: endorsed,
 		};
 
 		// For posts in scheduled topics, if edited before, use edit timestamp
