@@ -22,17 +22,18 @@ module.exports = function (Posts) {
 
 	Posts.edit = async function (data) {
 		const canEdit = await privileges.posts.canEdit(data.pid, data.uid);
-		if (!canEdit.flag) {
+		const postData = await Posts.getPostData(data.pid);
+		const topicData = await topics.getTopicFields(postData.tid, [
+			'cid', 'mainPid', 'title', 'timestamp', 'scheduled', 'slug', 'tags', 'uid'
+		]);
+
+		if (!canEdit.flag && !canEndorse(data, postData, topicData)) {
 			throw new Error(canEdit.message);
 		}
-		const postData = await Posts.getPostData(data.pid);
 		if (!postData) {
 			throw new Error('[[error:no-post]]');
 		}
 
-		const topicData = await topics.getTopicFields(postData.tid, [
-			'cid', 'mainPid', 'title', 'timestamp', 'scheduled', 'slug', 'tags',
-		]);
 
 		await scheduledTopicCheck(data, topicData);
 
@@ -216,5 +217,25 @@ module.exports = function (Posts) {
 	function rescheduling(data, topicData) {
 		const isMain = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
 		return isMain && topicData.scheduled && topicData.timestamp !== data.timestamp;
+	}
+
+	// Determines if an edit request can override normal edit permissions to endorse a post
+	function canEndorse(data, post, topic){
+		// Only can endorse if topic owner
+		if (data.uid != topic.uid){
+			return false;
+		}
+
+		// data must be endorsing
+		if (data.endorsed == undefined){
+			return false;
+		}
+
+		// Can't edit content in endorsement
+		if (data.content != post.content){
+			return false;
+		}
+
+		return true;
 	}
 };
