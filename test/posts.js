@@ -27,6 +27,7 @@ const request = require('../src/request');
 
 describe('Post\'s', () => {
 	let voterUid;
+	let replierUid;
 	let voteeUid;
 	let globalModUid;
 	let postData;
@@ -36,6 +37,7 @@ describe('Post\'s', () => {
 	before(async () => {
 		voterUid = await user.create({ username: 'upvoter' });
 		voteeUid = await user.create({ username: 'upvotee' });
+		replierUid = await user.create({ username: 'replier' });
 		globalModUid = await user.create({ username: 'globalmod', password: 'globalmodpwd' });
 		({ cid } = await categories.create({
 			name: 'Test Category',
@@ -384,6 +386,7 @@ describe('Post\'s', () => {
 		let pid;
 		let replyPid;
 		let tid;
+		let replyPid2;
 		before((done) => {
 			topics.post({
 				uid: voterUid,
@@ -403,7 +406,16 @@ describe('Post\'s', () => {
 				}, (err, data) => {
 					assert.ifError(err);
 					replyPid = data.pid;
-					privileges.categories.give(['groups:posts:edit'], cid, 'registered-users', done);
+					topics.reply({
+						uid: replierUid,
+						tid: tid,
+						timestamp: Date.now(),
+						content: 'Another reply to edit',
+					}, (err, data) => {
+						assert.ifError(err);
+						replyPid2 = data.pid;
+						privileges.categories.give(['groups:posts:edit'], cid, 'registered-users', done);
+					});
 				});
 			});
 		});
@@ -526,6 +538,24 @@ describe('Post\'s', () => {
 			assert.equal(data.editor, voterUid);
 			assert.equal(data.topic.title, 'edited deleted title');
 			assert.equal(data.topic.tags[0].value, 'deleted');
+		});
+
+		it('should endorse a post', async () => {
+			const data = await apiPosts.edit({ uid: voterUid }, { pid: replyPid2, content: 'Another reply to edit', endorsed: 'true' });
+			assert.equal(data.content, 'Another reply to edit');
+			assert.equal(data.editor, voterUid);
+			assert.equal(data.topic.isMainPost, false);
+			assert.equal(data.topic.renamed, false);
+			assert.equal(data.endorsed, 'true');
+		});
+
+		it('should unendorse a post', async () => {
+			const data = await apiPosts.edit({ uid: voterUid }, { pid: replyPid2, content: 'Another reply to edit', endorsed: 'true' });
+			assert.equal(data.content, 'Another reply to edit');
+			assert.equal(data.editor, voterUid);
+			assert.equal(data.topic.isMainPost, false);
+			assert.equal(data.topic.renamed, false);
+			assert.equal(data.endorsed, 'false');
 		});
 
 		it('should edit a reply post', async () => {
