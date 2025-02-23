@@ -514,6 +514,24 @@ describe('Post\'s', () => {
 			assert.strictEqual(data.editor, voterUid);
 			assert.strictEqual(data.topic.title, 'edited title');
 			assert.strictEqual(data.topic.tags[0].value, 'edited');
+			assert.strictEqual(data.contentFlag, false);
+			const res = await db.getObject(`post:${pid}`);
+			assert(!res.hasOwnProperty('bookmarks'));
+		});
+
+		it('should add content flag', async () => {
+			const data = await apiPosts.edit({ uid: voterUid }, {
+				pid: pid,
+				content: 'edited post content fuck',
+				title: 'edited title',
+				tags: ['edited'],
+			});
+
+			assert.strictEqual(data.content, 'edited post content fuck');
+			assert.strictEqual(data.editor, voterUid);
+			assert.strictEqual(data.topic.title, 'edited title');
+			assert.strictEqual(data.topic.tags[0].value, 'edited');
+			assert.strictEqual(data.contentFlag, true);
 			const res = await db.getObject(`post:${pid}`);
 			assert(!res.hasOwnProperty('bookmarks'));
 		});
@@ -538,6 +556,24 @@ describe('Post\'s', () => {
 			assert.equal(data.editor, voterUid);
 			assert.equal(data.topic.title, 'edited deleted title');
 			assert.equal(data.topic.tags[0].value, 'deleted');
+		});
+
+		it('should error if endorser is not thread owner', async () => {
+			try{
+				await apiPosts.edit({ uid: replierUid }, { pid: replyPid, content: 'A reply to edit', endorsed: 'true', });
+			} catch (err){
+				return;
+			}
+			assert(false);
+		});
+
+		it('should error if endorser changes content', async () => {
+			try{
+				await apiPosts.edit({ uid: voterUid }, { pid: replyPid2, content: 'New content', endorsed: 'true' });
+			} catch (err){
+				return;
+			}
+			assert(false);
 		});
 
 		it('should endorse a post', async () => {
