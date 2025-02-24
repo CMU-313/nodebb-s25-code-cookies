@@ -559,18 +559,18 @@ describe('Post\'s', () => {
 		});
 
 		it('should error if endorser is not thread owner', async () => {
-			try{
-				await apiPosts.edit({ uid: replierUid }, { pid: replyPid, content: 'A reply to edit', endorsed: 'true', });
-			} catch (err){
+			try {
+				await apiPosts.edit({ uid: replierUid }, { pid: replyPid, content: 'A reply to edit', endorsed: 'true' });
+			} catch (err) {
 				return;
 			}
 			assert(false);
 		});
 
 		it('should error if endorser changes content', async () => {
-			try{
+			try {
 				await apiPosts.edit({ uid: voterUid }, { pid: replyPid2, content: 'New content', endorsed: 'true' });
-			} catch (err){
+			} catch (err) {
 				return;
 			}
 			assert(false);

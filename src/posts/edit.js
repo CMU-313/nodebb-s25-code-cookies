@@ -24,7 +24,7 @@ module.exports = function (Posts) {
 		const canEdit = await privileges.posts.canEdit(data.pid, data.uid);
 		const postData = await Posts.getPostData(data.pid);
 		const topicData = await topics.getTopicFields(postData.tid, [
-			'cid', 'mainPid', 'title', 'timestamp', 'scheduled', 'slug', 'tags', 'uid'
+			'cid', 'mainPid', 'title', 'timestamp', 'scheduled', 'slug', 'tags', 'uid',
 		]);
 
 		if (!canEdit.flag && !canEndorse(data, postData, topicData)) {
@@ -195,11 +195,11 @@ module.exports = function (Posts) {
 
 	function getEditPostData(data, topicData, postData) {
 		// Toggle endorsed attribute if data.endorsed is true
-		let endorsed = postData.endorsed;
-		if (data.endorsed == 'true'){
-			endorsed = postData.endorsed == 'true' ? 'false' : 'true';
+		let { endorsed } = postData;
+		if (data.endorsed === 'true') {
+			endorsed = postData.endorsed === 'true' ? 'false' : 'true';
 		}
-		
+
 		const editPostData = {
 			content: data.content,
 			editor: data.uid,
@@ -226,19 +226,19 @@ module.exports = function (Posts) {
 	}
 
 	// Determines if an edit request can override normal edit permissions to endorse a post
-	function canEndorse(data, post, topic){
+	function canEndorse(data, post, topic) {
 		// Only can endorse if topic owner
-		if (data.uid != topic.uid){
+		if (data.uid !== topic.uid) {
 			return false;
 		}
 
 		// data must be endorsing
-		if (data.endorsed == undefined){
+		if (data.endorsed === undefined) {
 			return false;
 		}
 
 		// Can't edit content in endorsement
-		if (data.content != post.content){
+		if (data.content !== post.content) {
 			return false;
 		}
 

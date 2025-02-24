@@ -270,7 +270,6 @@ define('forum/topic/postTools', [
 				endorsed: 'true',
 			};
 			api.put(`/posts/${pid}`, postData, function (err, data) {
-				ready = true;
 				if (err) {
 					return alerts.error(err);
 				}
