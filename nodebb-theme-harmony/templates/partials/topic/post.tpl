@@ -33,8 +33,12 @@
 				</a>
 			</div>
 
-			<a class="fw-bold text-nowrap" href="{{{ if ./user.userslug }}}{config.relative_path}/user/{./user.userslug}{{{ else }}}#{{{ end }}}" data-username="{posts.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname}</a>
-
+			{{{ if posts.contentAnonymous }}}
+				<a class="fw-bold text-nowrap" data-username="{posts.user.username}" data-uid="{posts.user.uid}">{"Anonymous"}</a>
+			{{{ else }}}
+				<a class="fw-bold text-nowrap" href="{{{ if ./user.userslug }}}{config.relative_path}/user/{./user.userslug}{{{ else }}}#{{{ end }}}" data-username="{posts.user.username}" data-uid="{posts.user.uid}">{posts.user.displayname}</a>
+			{{{ end }}}
+		  
 			{{{ each posts.user.selectedGroups }}}
 			{{{ if posts.user.selectedGroups.slug }}}
 			<!-- IMPORT partials/groups/badge.tpl -->
