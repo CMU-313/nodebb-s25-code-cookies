@@ -13,10 +13,8 @@
 		<div class="anonymous-avatar"></div>
 	{{{ else }}}
 		<a class="d-inline-block position-relative text-decoration-none" href="{{{ if ./user.userslug }}}{config.relative_path}/user/{./user.userslug}{{{ else }}}#{{{ end }}}" aria-label="[[aria:user-avatar-for, {./user.username}]]">
-			{buildAvatar(posts.user, "48px", true, "", "user/picture")}
-			<span component="user/status" class="position-absolute translate-middle-y border border-white border-2 rounded-circle status {posts.user.status}">
-			<span class="visually-hidden">[[global:{posts.user.status}]]</span>
-			</span>
+		{buildAvatar(posts.user, "48px", true, "", "user/picture")}
+		<span component="user/status" class="position-absolute translate-middle-y border border-white border-2 rounded-circle status {posts.user.status}"><span class="visually-hidden">[[global:{posts.user.status}]]</span></span>
 		</a>
 	{{{ end }}}
   
