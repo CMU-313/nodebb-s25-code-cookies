@@ -50,7 +50,7 @@ module.exports = function (Posts) {
 			postData.contentFlag = data.contentFlag;
 		}
 
-		//set contentAnonymous based on if the anonymous checkbox was checked
+		// set contentAnonymous based on if the anonymous checkbox was checked
 		postData.contentAnonymous = data.anonymous;
 
 		let result = await plugins.hooks.fire('filter:post.create', { post: postData, data: data });

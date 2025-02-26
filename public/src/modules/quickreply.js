@@ -63,7 +63,7 @@ define('quickreply', [
 				tid: ajaxify.data.tid,
 				handle: undefined,
 				content: replyMsg,
-				anonymous: is_anonymous 
+				anonymous: is_anonymous,
 			};
 			const replyLen = replyMsg.length;
 			if (replyLen < parseInt(config.minimumPostLength, 10)) {
