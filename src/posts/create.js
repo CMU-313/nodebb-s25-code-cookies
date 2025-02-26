@@ -46,8 +46,12 @@ module.exports = function (Posts) {
 		if (data.handle && !parseInt(uid, 10)) {
 			postData.handle = data.handle;
 		}
-		postData.contentAnonymous = true;
-		// console.log("Anonymous attribute added");
+		if (data.contentFlag) {
+			postData.contentFlag = data.contentFlag;
+		}
+
+		// set contentAnonymous based on if the anonymous checkbox was checked
+		postData.contentAnonymous = data.anonymous;
 
 		let result = await plugins.hooks.fire('filter:post.create', { post: postData, data: data });
 		postData = result.post;
