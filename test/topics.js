@@ -290,7 +290,7 @@ describe('Topic\'s', () => {
 		});
 
 		it('should be anonymous', async () => {
-			const result = await topics.reply({ uid: topic.userId, content: 'hello this is anonymous', tid: newTopic.tid, toPid: newPost.pid, contentAnonymous: anonymous });
+			const result = await topics.reply({ uid: topic.userId, content: 'hello this is anonymous', tid: newTopic.tid, toPid: newPost.pid, anonymous: true });
 			assert.ok(result);
 
 			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
@@ -299,7 +299,7 @@ describe('Topic\'s', () => {
 		});
 
 		it('should not be anonymous', async () => {
-			const result = await topics.reply({ uid: topic.userId, content: 'hello this is not anonymous', tid: newTopic.tid, toPid: newPost.pid, contentAnonymous: null });
+			const result = await topics.reply({ uid: topic.userId, content: 'hello this is not anonymous', tid: newTopic.tid, toPid: newPost.pid, anonymous: false });
 			assert.ok(result);
 
 			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
