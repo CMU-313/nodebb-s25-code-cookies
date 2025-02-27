@@ -257,6 +257,35 @@ define('forum/topic/postTools', [
 		postContainer.on('click', '[component="post/chat"]', function () {
 			openChat($(this));
 		});
+
+		postContainer.on('click', '[component="post/endorse"]', async function () {
+			const btn = $(this);
+			const pid = getData(btn, 'data-pid');
+			const uid = getData(btn, 'data-uid');
+			const { content } = await api.get(`/posts/${pid}/raw`);
+			const postData = {
+				pid: Number(pid),
+				uid: Number(uid),
+				content: content,
+				endorsed: 'true',
+			};
+			api.put(`/posts/${pid}`, postData, function (err, data) {
+				if (err) {
+					return alerts.error(err);
+				}
+				if (data && data.queued) {
+					alerts.alert({
+						type: 'success',
+						title: '[[global:alert.success]]',
+						message: data.message,
+						timeout: 10000,
+						clickfn: function () {
+							ajaxify.go(`/post-queue/${data.id}`);
+						},
+					});
+				}
+			});
+		});
 	}
 
 	async function onReplyClicked(button, tid) {
