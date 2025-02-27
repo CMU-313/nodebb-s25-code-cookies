@@ -289,6 +289,24 @@ describe('Topic\'s', () => {
 			assert.equal(postData[1].contentFlag, 'true', 'result should have a content flag');
 		});
 
+		it('should be anonymous', async () => {
+			const result = await topics.reply({ uid: topic.userId, content: 'hello this is anonymous', tid: newTopic.tid, toPid: newPost.pid, anonymous: true });
+			assert.ok(result);
+
+			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
+			assert.ok(postData);
+			assert(postData[2].contentAnonymous);
+		});
+
+		it('should not be anonymous', async () => {
+			const result = await topics.reply({ uid: topic.userId, content: 'hello this is not anonymous', tid: newTopic.tid, toPid: newPost.pid, anonymous: false });
+			assert.ok(result);
+
+			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
+			assert.ok(postData);
+			assert(postData[3].contentAnonymous === 'false');
+		});
+
 		it('should error if pid is not a number', async () => {
 			await assert.rejects(
 				apiPosts.getReplies({ uid: 0 }, { pid: 'abc' }),
