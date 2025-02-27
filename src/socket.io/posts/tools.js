@@ -46,7 +46,7 @@ module.exports = function (SocketPosts) {
 		postData.display_purge_tools = results.canPurge;
 		postData.display_flag_tools = socket.uid && results.canFlag.flag;
 		postData.display_topic_owner_tools = socket.uid === topicsData.uid;
-		postData.display_moderator_tools = postData.display_edit_tools || postData.display_delete_tools;
+		postData.display_moderator_tools = results.isAdmin || results.isModerator;
 		postData.display_move_tools = results.isAdmin || results.isModerator;
 		postData.display_change_owner_tools = results.isAdmin || results.isModerator;
 		postData.display_ip_ban = (results.isAdmin || results.isGlobalMod) && !postData.selfPost;

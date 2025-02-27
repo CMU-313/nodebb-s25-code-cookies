@@ -1281,3 +1281,59 @@ describe('Posts\'', async () => {
 		});
 	});
 });
+
+describe('Post deletion by topic owner', () => {
+	let topicOwnerUid;
+	let posterUid;
+	let cid;
+	let tid;
+	let mainPid;
+	let replyPid;
+
+	before(async () => {
+		topicOwnerUid = await user.create({ username: 'topicowner' });
+		posterUid = await user.create({ username: 'regularuser' });
+
+		({ cid } = await categories.create({
+			name: 'Test Category',
+			description: 'Test category for topic owner deletion tests',
+		}));
+
+		const topicData = await topics.post({
+			uid: topicOwnerUid,
+			cid: cid,
+			title: 'Test Topic for Owner Deletion Rights',
+			content: 'This is the main post of the topic',
+		});
+
+		tid = topicData.topicData.tid;
+		mainPid = topicData.postData.pid;
+
+		const replyData = await topics.reply({
+			uid: posterUid,
+			tid: tid,
+			content: 'This is a reply posted by another user',
+		});
+
+		replyPid = replyData.pid;
+	});
+
+	it('should allow topic owner to delete any post under their topic', async () => {
+		assert(await user.exists(topicOwnerUid), 'Topic owner user should exist');
+		assert(await user.exists(posterUid), 'Poster user should exist');
+
+		const isOwner = await topics.isOwner(tid, topicOwnerUid);
+		assert.strictEqual(isOwner, true, 'User should be the topic owner');
+
+		const isPostOwner = await posts.isOwner(replyPid, topicOwnerUid);
+		assert.strictEqual(isPostOwner, false, 'Topic owner should not be the post owner');
+
+		await apiPosts.delete({ uid: topicOwnerUid }, { pid: replyPid, tid: tid });
+
+		const isDeleted = await posts.getPostField(replyPid, 'deleted');
+		assert.strictEqual(isDeleted, 1, 'Post should be marked as deleted');
+
+		const postExists = await posts.exists(replyPid);
+		assert.strictEqual(postExists, true, 'Post should still exist in database after deletion');
+	});
+});
