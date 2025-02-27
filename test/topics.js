@@ -295,7 +295,7 @@ describe('Topic\'s', () => {
 
 			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
 			assert.ok(postData);
-			assert(postData.contentAnonymous);
+			assert(postData[2].contentAnonymous);
 		});
 
 		it('should not be anonymous', async () => {
@@ -304,7 +304,7 @@ describe('Topic\'s', () => {
 
 			const postData = await apiPosts.getReplies({ uid: 0 }, { pid: newPost.pid });
 			assert.ok(postData);
-			assert(!postData.contentAnonymous);
+			assert(!postData[3].contentAnonymous);
 		});
 
 		it('should error if pid is not a number', async () => {
