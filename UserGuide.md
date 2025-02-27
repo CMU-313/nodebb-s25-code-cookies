@@ -27,3 +27,17 @@ This feature lets topic owners delete posts and replies under their post. The po
 To use this feature log in and create a new topic. Then log in to a different account and make a post or reply under the new topic. Then log back into the account that created the new topic and click on the '...' icon on the new post. There should be a button with a trash-can icon labeled 'delete'. Click on it. There will be a message asking if you really want to delete the post. Select yes. The post should now be marked as deleted.
 ## Automated Tests
 In the file test/posts.js there is a test case that checks a topic owner is able to delete a post under their topic. No additonal tests are needed because there exist tests to verify that users have the proper delete permissions. As such, there is no need to test that topic owners don't have more delete privileges than intended since it is covered for by existing tests (topic owners are regular users in other topics).
+
+# Anonymous Post Feature
+## What is it?
+This feature allows users to post replies anonymously under a topic by selecting an “anonymous” checkbox in the quick reply section. When this option is enabled, the user’s avatar, username, and all links to their profile will be hidden. Instead, the post will display a default avatar and the name “Anonymous.” This feature is particularly useful for students who may feel uncomfortable or embarrassed asking questions and promotes a less stressful learning environment.
+## How to Use and Test
+1. Open NodeBB and log in.
+2. Navigate to any topic and click the quick reply box at the bottom of the page.
+3. Type your reply and check the “anonymous” checkbox before submitting.
+4. Submit your reply and observe that the username is replaced with “Anonymous,” the avatar is a default gray circle, and all links to the user’s profile are removed.
+5. To verify that the post is indeed anonymous, attempt to click on the avatar or username; they should not lead to any profile.
+6. Post another reply without selecting the anonymous checkbox and ensure that the username and avatar display normally.
+## Automated Tests
+In test/topics.js, two key test cases were added to validate this feature. The first test verifies that when a user submits a post with the anonymous checkbox checked, the anonymous attribute is correctly set to true in the backend. The second test checks that when the anonymous checkbox is not selected, the anonymous attribute is set to false, ensuring the post retains the correct user information.
+The tests validate that the backend correctly assigns the anonymous attribute based on user input from the frontend. They ensure that anonymous posts do not retain user-identifying information and that non-anonymous posts display the correct user details. Since the feature introduces a single backend change, these tests are sufficient to confirm that the system reliably stores and retrieves the anonymous status while maintaining user privacy. Our tests cover every possible case of this feature and therefore provide extensive coverage of the functionality we added to the code for the anonymous feature
