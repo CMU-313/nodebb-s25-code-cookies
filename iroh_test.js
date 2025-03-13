@@ -2,7 +2,7 @@
 
 // to run test, run command `node <test_file_name>.js`
 // Running basic tests to check installation was done properly
-const Iroh = require('Iroh');
+const Iroh = require('iroh');
 // Log variables
 let code = 'let check = true';
 let stage = new Iroh.Stage(code);
