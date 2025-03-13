@@ -1,11 +1,9 @@
 'use strict';
 
-const customRequire = require('./require-main'); // Import custom require function
-
-const nconf = customRequire('nconf');
-const meta = customRequire('./src/meta');
-const _ = customRequire('lodash');
-const user = customRequire('./src/user');
+const nconf = require.main.require('nconf');
+const meta = require.main.require('./src/meta');
+const _ = require.main.require('lodash');
+const user = require.main.require('./src/user');
 
 const controllers = require('./lib/controllers');
 
