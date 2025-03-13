@@ -1,6 +1,3 @@
-//Set Up
-//to install, run `npm install Iroh`
-//if missing dependency, run `npm install babael`
 //to run test, run command `node <test_file_name>.js`
 
 // Running basic tests to check installation was done properly
