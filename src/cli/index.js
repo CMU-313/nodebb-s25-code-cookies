@@ -114,8 +114,6 @@ if (!configExists && process.argv[2] !== 'setup') {
 	return;
 }
 
-config_does_exist();
-
 if (configExists) {
 	process.env.CONFIG = configFile;
 }
