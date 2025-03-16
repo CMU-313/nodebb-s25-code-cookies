@@ -16,12 +16,11 @@ jobs:
       TEST_ENV: 'production'
 
     steps:
-      - uses: actions/checkout@v4
-
-      - run: cp install/package.json package.json
-
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Make Packages
+        run: cp install/package.json package.json
 
       - name: Install Node
         uses: actions/setup-node@v4
