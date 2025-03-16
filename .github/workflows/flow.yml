@@ -12,6 +12,8 @@ on:
 jobs:
   flow:
     runs-on: ubuntu-latest
+    env:
+      TEST_ENV: 'production'
 
     steps:
       - uses: actions/checkout@v4
