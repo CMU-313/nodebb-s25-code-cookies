@@ -1,2 +1,5 @@
-After setting up flow you must rerun:
+After setting up your nodebb repository you must rerun:
 npm install
+
+Write type annotations into flow directory and when ready to commit run:
+npx babel flow -d src --copy-files
