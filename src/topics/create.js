@@ -28,7 +28,8 @@ module.exports = function (Topics) {
       timestamp: timestamp,
       lastposttime: 0,
       postcount: 0,
-      viewcount: 0
+      viewcount: 0,
+      tags: undefined
     };
     if (Array.isArray(data.tags) && data.tags.length) {
       topicData.tags = data.tags.join(',');

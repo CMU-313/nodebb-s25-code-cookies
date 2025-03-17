@@ -1,3 +1,4 @@
+// @flow
 
 'use strict';
 
@@ -16,14 +17,26 @@ const categories = require('../categories');
 const translator = require('../translator');
 const flagContent = require('../posts/flagContent');
 
-module.exports = function (Topics) {
-	Topics.create = async function (data) {
+module.exports = function (Topics: any): any {
+	Topics.create = async function (data: any): Promise<string> {
 		// This is an internal method, consider using Topics.post instead
-		const timestamp = data.timestamp || Date.now();
+		const timestamp: number = data.timestamp || Date.now();
 
-		const tid = await db.incrObjectField('global', 'nextTid');
+		const tid: number = await db.incrObjectField('global', 'nextTid');
 
-		let topicData = {
+		let topicData: {
+			tid: number;
+			uid: number;
+			cid: ?number;
+			mainPid: number;
+			title: string;
+			slug: string;
+			timestamp: number;
+			lastposttime: number;
+			postcount: number;
+			viewcount: number;
+			tags: ?string;
+		} = {
 			tid: tid,
 			uid: data.uid,
 			cid: data.cid,
@@ -34,24 +47,25 @@ module.exports = function (Topics) {
 			lastposttime: 0,
 			postcount: 0,
 			viewcount: 0,
+			tags: undefined,
 		};
 
 		if (Array.isArray(data.tags) && data.tags.length) {
 			topicData.tags = data.tags.join(',');
 		}
 
-		const result = await plugins.hooks.fire('filter:topic.create', { topic: topicData, data: data });
+		const result: any = await plugins.hooks.fire('filter:topic.create', { topic: topicData, data: data });
 		topicData = result.topic;
 		await db.setObject(`topic:${topicData.tid}`, topicData);
 
-		const timestampedSortedSetKeys = [
+		const timestampedSortedSetKeys: string[] = [
 			'topics:tid',
 			`cid:${topicData.cid}:tids`,
 			`cid:${topicData.cid}:tids:create`,
 			`cid:${topicData.cid}:uid:${topicData.uid}:tids`,
 		];
 
-		const scheduled = timestamp > Date.now();
+		const scheduled: boolean = timestamp > Date.now();
 		if (scheduled) {
 			timestampedSortedSetKeys.push('topics:scheduled');
 		}
@@ -78,11 +92,14 @@ module.exports = function (Topics) {
 		return topicData.tid;
 	};
 
-	Topics.post = async function (data) {
+	Topics.post = async function (data: any): Promise<{
+		topicData: any;
+		postData: any;
+	}> {
 		data = await plugins.hooks.fire('filter:topic.post', data);
-		const { uid } = data;
+		const { uid }: { uid: number; } = data;
 
-		const [categoryExists, canCreate, canTag, isAdmin] = await Promise.all([
+		const [categoryExists, canCreate, canTag, isAdmin]: boolean[] = await Promise.all([
 			categories.exists(data.cid),
 			privileges.categories.can('topics:create', data.cid, uid),
 			privileges.categories.can('topics:tag', data.cid, uid),
@@ -118,16 +135,16 @@ module.exports = function (Topics) {
 			await user.isReadyToPost(uid, data.cid);
 		}
 
-		const tid = await Topics.create(data);
+		const tid: number = await Topics.create(data);
 
-		let postData = data;
+		let postData: any = data;
 		postData.tid = tid;
 		postData.ip = data.req ? data.req.ip : null;
 		postData.isMain = true;
 		postData = await posts.create(postData);
 		postData = await onNewPost(postData, data);
 
-		const [settings, topics] = await Promise.all([
+		const [settings, topics]: any[] = await Promise.all([
 			user.getSettings(uid),
 			Topics.getTopicsByTids([postData.tid], uid),
 		]);
@@ -139,7 +156,7 @@ module.exports = function (Topics) {
 		if (uid > 0 && settings.followTopicsOnCreate) {
 			await Topics.follow(postData.tid, uid);
 		}
-		const topicData = topics[0];
+		const topicData: any = topics[0];
 		topicData.unreplied = true;
 		topicData.mainPost = postData;
 		topicData.index = 0;
@@ -164,12 +181,12 @@ module.exports = function (Topics) {
 		};
 	};
 
-	Topics.reply = async function (data) {
+	Topics.reply = async function (data: any): Promise<any> {
 		data = await plugins.hooks.fire('filter:topic.reply', data);
-		const { tid } = data;
-		const { uid } = data;
+		const { tid }: { tid: number; } = data;
+		const { uid }: { uid: number; } = data;
 
-		const [topicData, isAdmin] = await Promise.all([
+		const [topicData, isAdmin]: any[] = await Promise.all([
 			Topics.getTopicData(tid),
 			privileges.users.isAdministrator(uid),
 		]);
@@ -200,10 +217,10 @@ module.exports = function (Topics) {
 		}
 
 		data.ip = data.req ? data.req.ip : null;
-		let postData = await posts.create(data);
+		let postData: any = await posts.create(data);
 		postData = await onNewPost(postData, data);
 
-		const settings = await user.getSettings(uid);
+		const settings: any = await user.getSettings(uid);
 		if (uid > 0 && settings.followTopicsOnReply) {
 			await Topics.follow(postData.tid, uid);
 		}
@@ -229,13 +246,13 @@ module.exports = function (Topics) {
 		return postData;
 	};
 
-	async function onNewPost(postData, data) {
-		const { tid, uid } = postData;
+	async function onNewPost(postData: any, data: any): Promise<any> {
+		const { tid, uid }: { tid: number; uid: number; } = postData;
 		await Topics.markAsRead([tid], uid);
 		const [
 			userInfo,
 			topicInfo,
-		] = await Promise.all([
+		]: any[] = await Promise.all([
 			posts.getUserInfoForPosts([postData.uid], uid),
 			Topics.getTopicFields(tid, ['tid', 'uid', 'title', 'slug', 'cid', 'postcount', 'mainPid', 'scheduled', 'tags']),
 			Topics.addParentPosts([postData]),
@@ -262,15 +279,15 @@ module.exports = function (Topics) {
 		return postData;
 	}
 
-	Topics.checkTitle = function (title) {
+	Topics.checkTitle = function (title: string): void {
 		check(title, meta.config.minimumTitleLength, meta.config.maximumTitleLength, 'title-too-short', 'title-too-long');
 	};
 
-	Topics.checkContent = function (content) {
+	Topics.checkContent = function (content: string): void {
 		check(content, meta.config.minimumPostLength, meta.config.maximumPostLength, 'content-too-short', 'content-too-long');
 	};
 
-	function check(item, min, max, minError, maxError) {
+	function check(item: ?any, min: number, max: number, minError: string, maxError: string): void {
 		// Trim and remove HTML (latter for composers that send in HTML, like redactor)
 		if (typeof item === 'string') {
 			item = utils.stripHTMLTags(item).trim();
@@ -283,7 +300,7 @@ module.exports = function (Topics) {
 		}
 	}
 
-	async function guestHandleValid(data) {
+	async function guestHandleValid(data: any): Promise<void> {
 		if (meta.config.allowGuestHandles && parseInt(data.uid, 10) === 0 && data.handle) {
 			if (data.handle.length > meta.config.maximumUsernameLength) {
 				throw new Error('[[error:guest-handle-invalid]]');
@@ -295,14 +312,19 @@ module.exports = function (Topics) {
 		}
 	}
 
-	async function canReply(data, topicData) {
+	async function canReply(data: any, topicData: any): Promise<void> {
 		if (!topicData) {
 			throw new Error('[[error:no-topic]]');
 		}
-		const { tid, uid } = data;
-		const { cid, deleted, locked, scheduled } = topicData;
+		const { tid, uid }: { tid: number; uid: number; } = data;
+		const { cid, deleted, locked, scheduled }: {
+			cid: ?number;
+			deleted: boolean;
+			locked: boolean;
+			scheduled: boolean;
+		} = topicData;
 
-		const [canReply, canSchedule, isAdminOrMod] = await Promise.all([
+		const [canReply, canSchedule, isAdminOrMod]: boolean[] = await Promise.all([
 			privileges.topics.can('topics:reply', tid, uid),
 			privileges.topics.can('topics:schedule', tid, uid),
 			privileges.categories.isAdminOrMod(cid, uid),
