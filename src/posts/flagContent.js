@@ -5,6 +5,6 @@ const BANNED_WORDS = ['\x66\x75\x63\x6b', '\x73\x68\x69\x74', '\x61\x73\x73', '\
 
 // Splits a content string and checks if any of the words in it are in the banned words list
 module.exports = function flagContent(content) {
-	const words = content.toLowerCase().split(' ');
-	return words.some(x => BANNED_WORDS.includes(x));
+  const words = content.toLowerCase().split(' ');
+  return words.some(x => BANNED_WORDS.includes(x));
 };
