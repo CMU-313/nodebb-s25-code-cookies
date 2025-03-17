@@ -12,8 +12,12 @@ const privileges = require('../privileges');
 module.exports = function (Posts) {
   Posts.create = async function (data) {
     // This is an internal method, consider using Topics.reply instead
-    const uid = data.uid;
-    const tid = data.tid;
+    const {
+      uid
+    } = data.uid;
+    const {
+      tid
+    } = data.tid;
     const content = data.content.toString();
     const timestamp = data.timestamp || Date.now();
     const isMain = data.isMain || false;
@@ -29,7 +33,12 @@ module.exports = function (Posts) {
       uid: uid,
       tid: tid,
       content: content,
-      timestamp: timestamp
+      timestamp: timestamp,
+      toPid: undefined,
+      ip: undefined,
+      handle: undefined,
+      contentFlag: undefined,
+      contentAnonymous: undefined
     };
     if (data.toPid) {
       postData.toPid = data.toPid;

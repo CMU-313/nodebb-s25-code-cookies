@@ -1,3 +1,5 @@
+// @flow
+
 'use strict';
 
 const _ = require('lodash');
@@ -11,11 +13,11 @@ const categories = require('../categories');
 const groups = require('../groups');
 const privileges = require('../privileges');
 
-module.exports = function (Posts) {
+module.exports = function (Posts: any): any {
 	Posts.create = async function (data: any): any {
 		// This is an internal method, consider using Topics.reply instead
-		const uid: string = data.uid;
-		const tid: string = data.tid;
+		const { uid }: { uid: string; } = data.uid;
+		const { tid }: {tid: string} = data.tid;
 		const content: string = data.content.toString();
 		const timestamp: number = data.timestamp || Date.now();
 		const isMain: boolean = data.isMain || false;
@@ -29,12 +31,28 @@ module.exports = function (Posts) {
 		}
 
 		const pid: string = await db.incrObjectField('global', 'nextPid');
-		let postData = {
+		let postData: {
+			pid: string;
+			uid: string;
+			tid: string;
+			content: string;
+			timestamp: number;
+			toPid: ?any;
+			ip: ?any;
+			handle: ?any;
+			contentFlag: ?string;
+			contentAnonymous: ?string;
+		} = {
 			pid: pid,
 			uid: uid,
 			tid: tid,
 			content: content,
 			timestamp: timestamp,
+			toPid: undefined,
+			ip: undefined,
+			handle: undefined,
+			contentFlag: undefined,
+			contentAnonymous: undefined,
 		};
 
 		if (data.toPid) {
@@ -77,7 +95,7 @@ module.exports = function (Posts) {
 		return result.post;
 	};
 
-	async function addReplyTo(postData: any, timestamp: number): void {
+	async function addReplyTo(postData: any, timestamp: number): Promise<any> {
 		if (!postData.toPid) {
 			return;
 		}
@@ -87,7 +105,7 @@ module.exports = function (Posts) {
 		]);
 	}
 
-	async function checkToPid(toPid: any, uid: string): void {
+	async function checkToPid(toPid: any, uid: string): Promise<any> {
 		const [toPost, canViewToPid] = await Promise.all([
 			Posts.getPostFields(toPid, ['pid', 'deleted']),
 			privileges.posts.can('posts:view_deleted', toPid, uid),
