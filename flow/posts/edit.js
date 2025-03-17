@@ -1,3 +1,5 @@
+// @flow
+
 'use strict';
 
 const validator = require('validator');
@@ -15,15 +17,28 @@ const slugify = require('../slugify');
 const translator = require('../translator');
 const flagContent = require('./flagContent');
 
-module.exports = function (Posts) {
-	pubsub.on('post:edit', (pid) => {
+module.exports = function (Posts: any): any {
+	pubsub.on('post:edit', (pid: string): void => {
 		require('./cache').del(pid);
 	});
 
-	Posts.edit = async function (data) {
-		const canEdit = await privileges.posts.canEdit(data.pid, data.uid);
-		const postData = await Posts.getPostData(data.pid);
-		const topicData = await topics.getTopicFields(postData.tid, [
+	Posts.edit = async function (data: any): Promise<{
+		topic: any;
+		editor: any;
+		post: any;
+	}> {
+		const canEdit: any = await privileges.posts.canEdit(data.pid, data.uid);
+		const postData: any = await Posts.getPostData(data.pid);
+		const topicData: {
+			cid: string;
+			mainPid: string;
+			title: string;
+			timestamp: number;
+			scheduled: boolean;
+			slug: string;
+			tags: any;
+			uid: string;
+		} = await topics.getTopicFields(postData.tid, [
 			'cid', 'mainPid', 'title', 'timestamp', 'scheduled', 'slug', 'tags', 'uid',
 		]);
 
@@ -37,14 +52,14 @@ module.exports = function (Posts) {
 
 		await scheduledTopicCheck(data, topicData);
 
-		const oldContent = postData.content; // for diffing purposes
-		const editPostData = getEditPostData(data, topicData, postData);
+		const oldContent: string = postData.content; // for diffing purposes
+		const editPostData: any = getEditPostData(data, topicData, postData);
 
 		if (data.handle) {
 			editPostData.handle = data.handle;
 		}
 
-		const result = await plugins.hooks.fire('filter:post.edit', {
+		const result: any = await plugins.hooks.fire('filter:post.edit', {
 			req: data.req,
 			post: editPostData,
 			data: data,
@@ -57,7 +72,7 @@ module.exports = function (Posts) {
 		]);
 
 		await Posts.setPostFields(data.pid, result.post);
-		const contentChanged = data.content !== oldContent ||
+		const contentChanged: boolean = data.content !== oldContent ||
 			topic.renamed ||
 			topic.tagsupdated;
 
@@ -76,7 +91,7 @@ module.exports = function (Posts) {
 		// Normalize data prior to constructing returnPostData (match types with getPostSummaryByPids)
 		postData.deleted = !!postData.deleted;
 
-		const returnPostData = { ...postData, ...result.post };
+		const returnPostData: any = { ...postData, ...result.post };
 		returnPostData.cid = topic.cid;
 		returnPostData.topic = topic;
 		returnPostData.editedISO = utils.toISOString(editPostData.edited);
@@ -105,46 +120,79 @@ module.exports = function (Posts) {
 		};
 	};
 
-	async function editMainPost(data, postData, topicData) {
-		const { tid } = postData;
-		const title = data.title ? data.title.trim() : '';
+	async function editMainPost(data: any, postData: any, topicData: any): Promise<{
+		tid: string;
+		uid: ?string;
+		cid: string;
+		title: string;
+		oldTitle: ?string;
+		slug: ?string;
+		isMainPost: boolean;
+		renamed: boolean;
+		tagsupdated: boolean;
+		tags: ?any;
+		oldTags: ?any;
+		rescheduled: ?boolean,
+	}> {
+		const { tid }: {tid: string;} = postData;
+		const title: string = data.title ? data.title.trim() : '';
 
-		const isMain = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
+		const isMain: boolean = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
 		if (!isMain) {
 			return {
 				tid: tid,
+				uid: undefined,
 				cid: topicData.cid,
 				title: topicData.title,
+				oldTitle: undefined,
 				isMainPost: false,
+				slug: undefined,
 				renamed: false,
+				tags: undefined,
+				oldTags: undefined,
 				tagsupdated: false,
+				rescheduled: undefined,
 			};
 		}
 
-		const newTopicData = {
+		const newTopicData: {
+			tid: string;
+			cid: string;
+			uid: string;
+			mainPid: boolean;
+			timestamp: number;
+			title: ?string;
+			oldTitle: ?string;
+			slug: ?string;
+			tags: ?any;
+		} = {
 			tid: tid,
 			cid: topicData.cid,
 			uid: postData.uid,
 			mainPid: data.pid,
 			timestamp: rescheduling(data, topicData) ? data.timestamp : topicData.timestamp,
+			title: undefined,
+			oldTitle: undefined,
+			slug: undefined,
+			tags: undefined,
 		};
 		if (title) {
 			newTopicData.title = title;
 			newTopicData.slug = `${tid}/${slugify(title) || 'topic'}`;
 		}
 
-		const tagsupdated = Array.isArray(data.tags) &&
+		const tagsupdated: boolean = Array.isArray(data.tags) &&
 			!_.isEqual(data.tags, topicData.tags.map(tag => tag.value));
 
 		if (tagsupdated) {
-			const canTag = await privileges.categories.can('topics:tag', topicData.cid, data.uid);
+			const canTag: boolean = await privileges.categories.can('topics:tag', topicData.cid, data.uid);
 			if (!canTag) {
 				throw new Error('[[error:no-privileges]]');
 			}
 			await topics.validateTags(data.tags, topicData.cid, data.uid, tid);
 		}
 
-		const results = await plugins.hooks.fire('filter:topic.edit', {
+		const results: any = await plugins.hooks.fire('filter:topic.edit', {
 			req: data.req,
 			topic: newTopicData,
 			data: data,
@@ -153,7 +201,7 @@ module.exports = function (Posts) {
 		if (tagsupdated) {
 			await topics.updateTopicTags(tid, data.tags);
 		}
-		const tags = await topics.getTopicTagsObjects(tid);
+		const tags: any = await topics.getTopicTagsObjects(tid);
 
 		if (rescheduling(data, topicData)) {
 			await topics.scheduled.reschedule(newTopicData);
@@ -161,7 +209,7 @@ module.exports = function (Posts) {
 
 		newTopicData.tags = data.tags;
 		newTopicData.oldTitle = topicData.title;
-		const renamed = title && translator.escape(validator.escape(String(title))) !== topicData.title;
+		const renamed: boolean = Boolean(title) && (translator.escape(validator.escape(String(title))) !== topicData.title);
 		plugins.hooks.fire('action:topic.edit', { topic: newTopicData, uid: data.uid });
 		return {
 			tid: tid,
@@ -179,32 +227,48 @@ module.exports = function (Posts) {
 		};
 	}
 
-	async function scheduledTopicCheck(data, topicData) {
+	async function scheduledTopicCheck(data: any, topicData: any): Promise<any> {
 		if (!topicData.scheduled) {
 			return;
 		}
-		const canSchedule = await privileges.categories.can('topics:schedule', topicData.cid, data.uid);
+		const canSchedule: boolean = await privileges.categories.can('topics:schedule', topicData.cid, data.uid);
 		if (!canSchedule) {
 			throw new Error('[[error:no-privileges]]');
 		}
-		const isMain = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
+		const isMain: boolean = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
 		if (isMain && isNaN(data.timestamp)) {
 			throw new Error('[[error:invalid-data]]');
 		}
 	}
 
-	function getEditPostData(data, topicData, postData) {
+	function getEditPostData(data: any, topicData: any, postData: any): {
+		content: string;
+		editor: string;
+		contentFlag: boolean;
+		endorsed: string;
+		edited: ?number;
+		timestamp: ?number;
+	} {
 		// Toggle endorsed attribute if data.endorsed is true
-		let { endorsed } = postData;
+		let { endorsed }: { endorsed: string; } = postData;
 		if (data.endorsed === 'true') {
 			endorsed = postData.endorsed === 'true' ? 'false' : 'true';
 		}
 
-		const editPostData = {
+		const editPostData: {
+			content: string;
+			editor: string;
+			contentFlag: boolean;
+			endorsed: string;
+			edited: ?number;
+			timestamp: ?number;
+		} = {
 			content: data.content,
 			editor: data.uid,
 			contentFlag: flagContent(data.content),
 			endorsed: endorsed,
+			edited: undefined,
+			timestamp: undefined,
 		};
 
 		// For posts in scheduled topics, if edited before, use edit timestamp
@@ -220,13 +284,13 @@ module.exports = function (Posts) {
 		return editPostData;
 	}
 
-	function rescheduling(data, topicData) {
-		const isMain = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
+	function rescheduling(data: any, topicData: any): boolean {
+		const isMain: boolean = parseInt(data.pid, 10) === parseInt(topicData.mainPid, 10);
 		return isMain && topicData.scheduled && topicData.timestamp !== data.timestamp;
 	}
 
 	// Determines if an edit request can override normal edit permissions to endorse a post
-	function canEndorse(data, post, topic) {
+	function canEndorse(data: any, post: any, topic: any): boolean {
 		// Only can endorse if topic owner
 		if (data.uid !== topic.uid) {
 			return false;

@@ -95,11 +95,17 @@ module.exports = function (Posts) {
     if (!isMain) {
       return {
         tid: tid,
+        uid: undefined,
         cid: topicData.cid,
         title: topicData.title,
+        oldTitle: undefined,
         isMainPost: false,
+        slug: undefined,
         renamed: false,
-        tagsupdated: false
+        tags: undefined,
+        oldTags: undefined,
+        tagsupdated: false,
+        rescheduled: undefined
       };
     }
     const newTopicData = {
@@ -107,7 +113,11 @@ module.exports = function (Posts) {
       cid: topicData.cid,
       uid: postData.uid,
       mainPid: data.pid,
-      timestamp: rescheduling(data, topicData) ? data.timestamp : topicData.timestamp
+      timestamp: rescheduling(data, topicData) ? data.timestamp : topicData.timestamp,
+      title: undefined,
+      oldTitle: undefined,
+      slug: undefined,
+      tags: undefined
     };
     if (title) {
       newTopicData.title = title;
@@ -136,7 +146,7 @@ module.exports = function (Posts) {
     }
     newTopicData.tags = data.tags;
     newTopicData.oldTitle = topicData.title;
-    const renamed = title && translator.escape(validator.escape(String(title))) !== topicData.title;
+    const renamed = Boolean(title) && translator.escape(validator.escape(String(title))) !== topicData.title;
     plugins.hooks.fire('action:topic.edit', {
       topic: newTopicData,
       uid: data.uid
@@ -181,7 +191,9 @@ module.exports = function (Posts) {
       content: data.content,
       editor: data.uid,
       contentFlag: flagContent(data.content),
-      endorsed: endorsed
+      endorsed: endorsed,
+      edited: undefined,
+      timestamp: undefined
     };
 
     // For posts in scheduled topics, if edited before, use edit timestamp
