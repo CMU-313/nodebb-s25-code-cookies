@@ -14,10 +14,10 @@ module.exports = function (Posts) {
     // This is an internal method, consider using Topics.reply instead
     const {
       uid
-    } = data.uid;
+    } = data;
     const {
       tid
-    } = data.tid;
+    } = data;
     const content = data.content.toString();
     const timestamp = data.timestamp || Date.now();
     const isMain = data.isMain || false;

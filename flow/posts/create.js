@@ -16,8 +16,8 @@ const privileges = require('../privileges');
 module.exports = function (Posts: any): any {
 	Posts.create = async function (data: any): any {
 		// This is an internal method, consider using Topics.reply instead
-		const { uid }: { uid: string; } = data.uid;
-		const { tid }: {tid: string} = data.tid;
+		const { uid }: { uid: string; } = data;
+		const { tid }: { tid: string } = data;
 		const content: string = data.content.toString();
 		const timestamp: number = data.timestamp || Date.now();
 		const isMain: boolean = data.isMain || false;
