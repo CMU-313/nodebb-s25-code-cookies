@@ -12,13 +12,13 @@ const groups = require('../groups');
 const privileges = require('../privileges');
 
 module.exports = function (Posts) {
-	Posts.create = async function (data) {
+	Posts.create = async function (data: any): any {
 		// This is an internal method, consider using Topics.reply instead
-		const { uid } = data;
-		const { tid } = data;
-		const content = data.content.toString();
-		const timestamp = data.timestamp || Date.now();
-		const isMain = data.isMain || false;
+		const uid: string = data.uid;
+		const tid: string = data.tid;
+		const content: string = data.content.toString();
+		const timestamp: number = data.timestamp || Date.now();
+		const isMain: boolean = data.isMain || false;
 
 		if (!uid && parseInt(uid, 10) !== 0) {
 			throw new Error('[[error:invalid-uid]]');
@@ -28,7 +28,7 @@ module.exports = function (Posts) {
 			await checkToPid(data.toPid, uid);
 		}
 
-		const pid = await db.incrObjectField('global', 'nextPid');
+		const pid: string = await db.incrObjectField('global', 'nextPid');
 		let postData = {
 			pid: pid,
 			uid: uid,
@@ -53,11 +53,11 @@ module.exports = function (Posts) {
 		// set contentAnonymous based on if the anonymous checkbox was checked
 		postData.contentAnonymous = data.anonymous;
 
-		let result = await plugins.hooks.fire('filter:post.create', { post: postData, data: data });
+		let result: {post: any; data: string;} = await plugins.hooks.fire('filter:post.create', { post: postData, data: data });
 		postData = result.post;
 		await db.setObject(`post:${postData.pid}`, postData);
 
-		const topicData = await topics.getTopicFields(tid, ['cid', 'pinned']);
+		const topicData: {cid: string; pinned: any;} = await topics.getTopicFields(tid, ['cid', 'pinned']);
 		postData.cid = topicData.cid;
 
 		await Promise.all([
@@ -77,7 +77,7 @@ module.exports = function (Posts) {
 		return result.post;
 	};
 
-	async function addReplyTo(postData, timestamp) {
+	async function addReplyTo(postData: any, timestamp: number): void {
 		if (!postData.toPid) {
 			return;
 		}
@@ -87,12 +87,12 @@ module.exports = function (Posts) {
 		]);
 	}
 
-	async function checkToPid(toPid, uid) {
+	async function checkToPid(toPid: any, uid: string): void {
 		const [toPost, canViewToPid] = await Promise.all([
 			Posts.getPostFields(toPid, ['pid', 'deleted']),
 			privileges.posts.can('posts:view_deleted', toPid, uid),
 		]);
-		const toPidExists = !!toPost.pid;
+		const toPidExists: boolean = !!toPost.pid;
 		if (!toPidExists || (toPost.deleted && !canViewToPid)) {
 			throw new Error('[[error:invalid-pid]]');
 		}

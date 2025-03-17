@@ -92,12 +92,9 @@ const configFile = path.resolve(paths.baseDir, nconf.get('config') || 'config.js
 const configExists = file.existsSync(configFile) || nconf.get('url') && nconf.get('secret') && nconf.get('database');
 prestart.loadConfig(configFile);
 prestart.versionCheck();
-(() => {
-  if (!configExists && process.argv[2] !== 'setup') {
-    require('./setup').webInstall();
-    return;
-  }
-})();
+if (!configExists && process.argv[2] !== 'setup') {
+  require('./setup').webInstall();
+}
 if (configExists) {
   process.env.CONFIG = configFile;
 }
