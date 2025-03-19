@@ -1,0 +1,39 @@
+name: Flow
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_call: # Usually called from deploy
+
+jobs:
+  flow:
+    runs-on: ubuntu-latest
+    env:
+      TEST_ENV: 'production'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Make Packages
+        run: cp install/package.json package.json
+
+      - name: Install Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: NPM Install
+        uses: bahmutov/npm-install@v1
+        with:
+          useLockFile: false
+
+      - name: Run Flow Init
+        run: npm run flow init
+      
+      - name: Run Flow
+        run: npm run flow

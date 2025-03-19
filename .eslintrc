@@ -1,3 +1,9 @@
 {
-	"extends": "nodebb"
+	"parser": "hermes-eslint",
+	"plugins": ["ft-flow"],
+	"extends": ["plugin:ft-flow/recommended", "nodebb"],
+	"rules": {
+		"no-redeclare": "off"
+	}
 }
+  
