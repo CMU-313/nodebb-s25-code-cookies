@@ -73,3 +73,6 @@ test.sh
 
 .docker/**
 !**/.gitkeep
+
+##Flow Config File
+.flowconfig
