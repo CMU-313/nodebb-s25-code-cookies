@@ -1,0 +1,9 @@
+
+> nodebb@3.8.4 flow
+> flow
+
+Launching Flow server for /home/ryan/nodebb-s25-code-cookies
+Spawned flow server (pid=1357)
+Logs will go to /tmp/flow/zShomezSryanzSnodebb-s25-code-cookies.log
+Monitor logs will go to /tmp/flow/zShomezSryanzSnodebb-s25-code-cookies.monitor_log
+No errors!
