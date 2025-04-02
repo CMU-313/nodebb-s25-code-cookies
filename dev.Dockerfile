@@ -38,6 +38,8 @@ COPY --from=git --chown=${USER}:${USER} /usr/src/app/install/package.json /usr/s
 
 USER ${USER}
 
+RUN npm link nodebb-theme-harmony
+
 RUN npm install
   
 FROM node:lts-slim AS final
